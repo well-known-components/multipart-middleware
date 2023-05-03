@@ -24,9 +24,10 @@ describe("unit", () => {
       const form = new FormData()
       form.append('my_file', fs.createReadStream('test/bar.jpg'), 'bar.jpg' );
 
-      await server.fetch('/test', {
+      const res = await server.fetch('/test', {
           method: 'POST',
           body: form
       })
+      expect(res.status).toEqual(200)
   })
 })
