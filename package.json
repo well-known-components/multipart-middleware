@@ -1,5 +1,5 @@
 {
-  "name": "@well-known-components/base-component",
+  "name": "multipart-wrapper",
   "version": "1.0.0",
   "description": "base component",
   "main": "dist/index.js",
@@ -22,6 +22,7 @@
   "homepage": "https://github.com/well-known-components/base-component#readme",
   "devDependencies": {
     "@microsoft/api-extractor": "^7.17.0",
+    "@types/busboy": "^1.5.0",
     "@types/jest": "^28.1.0",
     "jest": "^28.1.0",
     "ts-jest": "^28.0.4",
@@ -29,5 +30,9 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "@well-known-components/interfaces": "^1.3.0",
+    "busboy": "^1.6.0"
+  }
 }
