@@ -3,7 +3,8 @@ import busboy, { FieldInfo, FileInfo } from 'busboy'
 import { Readable } from 'stream'
 
 /**
- * @internal
+ * The handler context, enriched with form data
+ * @public
  */
 export type FormDataContext = IHttpServerComponent.DefaultContext & {
   formData: {

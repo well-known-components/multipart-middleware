@@ -10,9 +10,7 @@ import { FieldInfo } from 'busboy';
 import { FileInfo } from 'busboy';
 import { IHttpServerComponent } from '@well-known-components/interfaces';
 
-// Warning: (ae-internal-missing-underscore) The name "FormDataContext" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
+// @public
 export type FormDataContext = IHttpServerComponent.DefaultContext & {
     formData: {
         fields: Record<string, FieldInfo & {
@@ -26,8 +24,6 @@ export type FormDataContext = IHttpServerComponent.DefaultContext & {
     };
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "multipartParserWrapper" is marked as @public, but its signature references "FormDataContext" which is marked as @internal
-//
 // @public
 export function multipartParserWrapper<Ctx extends FormDataContext, T extends IHttpServerComponent.IResponse>(handler: (ctx: Ctx) => Promise<T>): (ctx: IHttpServerComponent.DefaultContext) => Promise<T>;
 
