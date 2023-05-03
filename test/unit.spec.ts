@@ -12,7 +12,7 @@ describe("unit", () => {
       server.use(router.middleware())
 
       router.post('/test', 
-                  multipartParserWrapper(async(ctx: FormDataContext)  => {
+                  multipartParserWrapper(async(ctx: FormDataContext<{}>)  => {
                       expect(ctx.formData.files['my_file']).toBeTruthy()
                       expect(ctx.formData.files['my_file'].filename).toEqual('bar.jpg')
                       expect(ctx.formData.files['my_file'].mimeType).toEqual('image/jpeg')
