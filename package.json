@@ -1,5 +1,5 @@
 {
-  "name": "multipart-wrapper",
+  "name": "@well-known-components/multipart-wrapper",
   "version": "1.0.0",
   "description": "base component",
   "main": "dist/index.js",
