@@ -11,21 +11,28 @@ import { FileInfo } from 'busboy';
 import { IHttpServerComponent } from '@well-known-components/interfaces';
 
 // @public
-export type FormDataContext = IHttpServerComponent.DefaultContext & {
+export type Field = FieldInfo & {
+    fieldname: string;
+    value: string;
+};
+
+// @public
+type File_2 = FileInfo & {
+    fieldname: string;
+    value: Buffer;
+};
+export { File_2 as File }
+
+// @public
+export type FormDataContext<T> = IHttpServerComponent.DefaultContext<T> & {
     formData: {
-        fields: Record<string, FieldInfo & {
-            fieldname: string;
-            value: string;
-        }>;
-        files: Record<string, FileInfo & {
-            fieldname: string;
-            value: Buffer;
-        }>;
+        fields: Record<string, Field>;
+        files: Record<string, File_2>;
     };
 };
 
 // @public
-export function multipartParserWrapper<Ctx extends FormDataContext, T extends IHttpServerComponent.IResponse>(handler: (ctx: Ctx) => Promise<T>): (ctx: IHttpServerComponent.DefaultContext) => Promise<T>;
+export function multipartParserWrapper<U, Ctx extends FormDataContext<U>, T extends IHttpServerComponent.IResponse>(handler: (ctx: Ctx) => Promise<T>): (ctx: IHttpServerComponent.DefaultContext<U>) => Promise<T>;
 
 // (No @packageDocumentation comment for this package)
 
