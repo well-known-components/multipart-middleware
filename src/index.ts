@@ -1,14 +1,14 @@
-import { IHttpServerComponent } from '@well-known-components/interfaces'
-import busboy, { FieldInfo, FileInfo } from 'busboy'
-import { Readable } from 'stream'
+import { IHttpServerComponent } from "@well-known-components/interfaces"
+import busboy, { FieldInfo, FileInfo } from "busboy"
+import { Readable } from "stream"
 
 /**
  * Field Info
  * @public
  */
 export type Field = FieldInfo & {
-    fieldname: string
-    value: string
+  fieldname: string
+  value: string
 }
 
 /**
@@ -16,8 +16,8 @@ export type Field = FieldInfo & {
  * @public
  */
 export type File = FileInfo & {
-    fieldname: string
-    value: Buffer
+  fieldname: string
+  value: Buffer
 }
 
 /**
@@ -25,10 +25,10 @@ export type File = FileInfo & {
  * @public
  */
 export type FormDataContext<T> = IHttpServerComponent.DefaultContext<T> & {
-    formData: {
-        fields: Record< string, Field >
-        files: Record< string, File>
-    }
+  formData: {
+    fields: Record<string, Field>
+    files: Record<string, File>
+  }
 }
 
 /**
@@ -36,53 +36,56 @@ export type FormDataContext<T> = IHttpServerComponent.DefaultContext<T> & {
  * @public
  */
 export function multipartParserWrapper<U, Ctx extends FormDataContext<U>, T extends IHttpServerComponent.IResponse>(
-    handler: (ctx: Ctx) => Promise<T>
+  handler: (ctx: Ctx) => Promise<T>,
 ): (ctx: IHttpServerComponent.DefaultContext<U>) => Promise<T> {
-    return async function (ctx): Promise<T> {
-        const formDataParser = busboy({
-            headers: {
-                'content-type': ctx.request.headers.get('content-type') || undefined
-            }
-        })
+  return async function (ctx): Promise<T> {
+    const formDataParser = busboy({
+      headers: {
+        "content-type": ctx.request.headers.get("content-type") || undefined,
+      },
+    })
 
-        const fields: Record<string, Field> = {}
-        const files: Record<string, File> = {}
+    const fields: Record<string, Field> = {}
+    const files: Record<string, File> = {}
 
-        const finished = new Promise((ok, err) => {
-            formDataParser.on('error', err)
-            formDataParser.on('finish', ok)
-        })
+    const finished = new Promise((ok, err) => {
+      formDataParser.on("error", err)
+      formDataParser.on("finish", ok)
+    })
 
-        /**
-         * Emitted for each new non-file field found.
-         */
-        formDataParser.on('field', function (name: string, value: string, info: FieldInfo): void {
-            fields[name] = {
-                fieldname: name,
-                value,
-                ...info
-            }
-        })
-        formDataParser.on('file', function (name: string, stream: Readable, info: FileInfo) {
-            const chunks: any[] = []
-            stream.on('data', function (data) {
-                chunks.push(data)
-            })
-            stream.on('end', function () {
-                files[name] = {
-                    ...info,
-                    fieldname: name,
-                    value: Buffer.concat(chunks)
-                }
-            })
-        })
+    /**
+     * Emitted for each new non-file field found.
+     */
+    formDataParser.on("field", function (name: string, value: string, info: FieldInfo): void {
+      fields[name] = {
+        fieldname: name,
+        value,
+        ...info,
+      }
+    })
+    formDataParser.on("file", function (name: string, stream: Readable, info: FileInfo) {
+      const chunks: any[] = []
+      stream.on("data", function (data) {
+        chunks.push(data)
+      })
+      stream.on("error", function (err) {
+        console.error("stream error", err)
+      })
+      stream.on("end", function () {
+        files[name] = {
+          ...info,
+          fieldname: name,
+          value: Buffer.concat(chunks),
+        }
+      })
+    })
 
-        ctx.request.body.pipe(formDataParser)
+    ctx.request.body.pipe(formDataParser)
 
-        const newContext: Ctx = Object.assign(Object.create(ctx), { formData: { fields, files } })
+    const newContext: Ctx = Object.assign(Object.create(ctx), { formData: { fields, files } })
 
-        await finished
+    await finished
 
-        return handler(newContext)
-    }
+    return handler(newContext)
+  }
 }
